@@ -6,14 +6,8 @@ import argparse
 import boto3
 
 
-#  See custom.conf for more details
-# execute in the shell : java -Dconfig.file=custom.conf -jar elasticmq-server-XXX.jar
-
-
-
 def connect(url, region, aws_secret_access_key, aws_access_key_id):
-    """Connects to the SQS server related to those credentials.
-    Execute before java -Dconfig.file=custom.conf -jar elasticmq-server-XXX.jar """
+    """Connects to the SQS server related to those credentials."""
     client = boto3.resource('sqs',
                             endpoint_url=url,  #
                             region_name=region,  #

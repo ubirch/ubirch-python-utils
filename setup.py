@@ -8,7 +8,7 @@ setuptools.setup(
     version="1.0.0",
     author="Victor Patrin",
     author_email="victor.patrin150@gmail.com",
-    description="A python utils library for ubirch anchoring services.",
+    description="A python utils ubirch for ubirch anchoring services.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/ubirch/ubirch-python-utils",

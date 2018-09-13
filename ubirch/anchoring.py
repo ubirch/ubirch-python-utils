@@ -67,9 +67,7 @@ def process_message(m, errorQueue, queue2, storefunction):
     """Anchors the message m in a DLT specified by the storefunction parameter.
     Sends error (non hex message and timeouts) in the errorQueue.
     Sends JSON docs containing the txid and the input data in queue2 if the anchoring was successful"""
-    t0 = time.time()
     storingResult = storefunction(m.body) #Anchoring of the message body
-    print("anchoring time = " + str(time.time() - t0))
     if storingResult == False:
         json_error = json.dumps({"Not a hash": m.body})
         send(errorQueue, json_error)
@@ -89,8 +87,6 @@ def poll(queue1, errorQueue, queue2, storefunction):
     """Process messages received from queue1"""
     messages = queue1.receive_messages()  # Note: MaxNumberOfMessages default is 1.
     for m in messages:
-        t0 = time.time()
         process_message(m, errorQueue, queue2, storefunction)
-        print(" total processing time = " + str(time.time() - t0))
 
 

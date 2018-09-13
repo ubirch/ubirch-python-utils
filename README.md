@@ -25,6 +25,9 @@ keyfile = args.keyfile
 queue1 = getQueue('queue1', url, region, aws_secret_access_key, aws_access_key_id)
 
 ```
+### Polling a queue and processing its messages
+
+Please see [ubirch-ethereum-service](https://github.com/ubirch/ubirch-ethereum-service/blob/master/ethereumService.py) or [ubirch-iota-service](https://github.com/ubirch/ubirch-iota-service/blob/master/iotaService.py) to how this library is put into action. 
 
 ### Testing
 
@@ -36,4 +39,4 @@ python3 -m unittest discover
 
 # License 
 
-The protocol and its implementation are publicized under the [Apache License 2.0](LICENSE).
+This library is publicized under the [Apache License 2.0](LICENSE).

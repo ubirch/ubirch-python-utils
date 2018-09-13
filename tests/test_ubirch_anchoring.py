@@ -29,6 +29,7 @@ region = args.region
 aws_secret_access_key = args.accesskey
 aws_access_key_id = args.keyid
 
+# TODO : add more tests
 
 class TestUbirchAnchoring(unittest.TestCase):
 
@@ -38,7 +39,7 @@ class TestUbirchAnchoring(unittest.TestCase):
         nonhex = "0x123helloworld"
         self.assertTrue(is_hex(lowerhex))
         self.assertTrue(is_hex(upperhex))
-        self.assertFalse(is_hex(nonhex))
+        self.assertTrue(not(is_hex(nonhex)))
 
 
 

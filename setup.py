@@ -20,5 +20,7 @@ setuptools.setup(
     ),
     install_requires=[
         'boto3 >= 1.7.80'
+        'kafka-python >= 1.4.3'
+
     ],
 )

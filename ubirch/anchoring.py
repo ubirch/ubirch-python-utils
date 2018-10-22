@@ -20,54 +20,38 @@
 
 import json
 import argparse
-import boto3
+
+from kafka import KafkaProducer
+from kafka import KafkaConsumer
 
 
-def connect(url, region, aws_secret_access_key, aws_access_key_id):
-    """Connects to the SQS server related to those credentials."""
-    client = boto3.resource('sqs',
-                            endpoint_url=url,  #
-                            region_name=region,  #
-                            aws_secret_access_key=aws_secret_access_key,  # parameters passed as arguments
-                            aws_access_key_id=aws_access_key_id,  #
-                            use_ssl=False)
-    return client
+def producerInstance(port):
+    """Creates an instance of a producer """
+    producer_instance = KafkaProducer(bootstrap_servers=port)
+    return producer_instance
 
 
-def getQueue(queue_name, url, region, aws_secret_access_key, aws_access_key_id):
-    """Returns the queue with the name queue_name of the server identified by the other parameters"""
-    client = connect(url, region, aws_secret_access_key, aws_access_key_id)
-    queue = client.get_queue_by_name(QueueName=queue_name)
-    print("The queue : " + queue_name + " has : " + queue.url + " for URL")
-    return queue
+def consumerInstance(port, topic):
+    """Creates an instance of consumer of a defined topic """
+    consumer_instance = KafkaConsumer(bootstrap_servers=port, topic=topic)
+    return consumer_instance
 
 
 def set_arguments(servicetype):
-    """Set up the credentials of connection to be those of the elasticMQ Server if not specified otherwise"""
-
     parser = argparse.ArgumentParser(description="Ubirch " + servicetype + " anchoring service")
-    parser.add_argument('-u', '--url',
-                        help="endpoint url of the sqs server, input localhost:9324 for local connection (default)",
-                        metavar="URL", type=str, default="http://localhost:9324")
-    parser.add_argument('-r', '--region', help="region name of sqs server, (default : 'elasticmq' for local)",
-                        metavar="REGION", type=str, default="elasticmq")
-    parser.add_argument('-ak', '--accesskey', help="AWS secret access key, input 'x'for local connection (default)",
-                        metavar="SECRETACCESSKEY", type=str, default="x")
-    parser.add_argument('-ki', '--keyid', help="AWS access key id, input 'x' for local connection (default)",
-                        metavar="KEYID", type=str, default="x")
-
-    parser.add_argument('-p', '--pwd', help="password used to decrypt the Keystore File",
-                        metavar="PASSWORD", type=str)
+    parser.add_argument('-p', '--port',
+                        help="port of the producer or consumer, default is 9092",
+                        metavar="PORT", type=str, default="localhost:9092")
     parser.add_argument('-kf', '--keyfile', help='location of your keyfile', metavar='PATH TO KEYFILE', type=str)
 
     return parser.parse_args()
 
 
-def send(queue, msg):
-    """ Sends a message to the queue, return a SQS.Message element"""
-    return queue.send_message(
-        MessageBody=msg
-    )
+def send(producer, topic, message):
+    """ Sends a message to the topic via the producer and then flushes"""
+    message_bytes = bytes(message)
+    producer.send(topic, value=message_bytes)
+    producer.flush()
 
 
 def is_hex(s):
@@ -80,30 +64,31 @@ def is_hex(s):
 
 
 # storefunction should always return either False is the string is non-hex or a dict containing {'txid': hash, 'hash': string}
-def process_message(m, errorQueue, queue2, storefunction):
+def process_message(message, errorQueue, queue2, storefunction, producer):
     """Anchors the message m in a DLT specified by the storefunction parameter.
     Sends error (non hex message and timeouts) in the errorQueue.
     Sends JSON docs containing the txid and the input data in queue2 if the anchoring was successful"""
-    storingResult = storefunction(m.body) #Anchoring of the message body
+
+    storingResult = storefunction(message) #Anchoring of the message body
     if storingResult == False:
-        json_error = json.dumps({"Not a hash": m.body})
-        send(errorQueue, json_error)
+        json_error = json.dumps({"Not a hash": message})
+        send(producer=producer, topic=errorQueue, message=json_error)
 
     elif storingResult['status'] == 'timeout':
         json_error = json.dumps(storingResult)
-        send(errorQueue, json_error)
+        send(producer=producer, topic=errorQueue, message=json_error)
 
     else:
         json_data = json.dumps(storingResult)
-        send(queue2, json_data)
-
-    m.delete()
+        send(producer=producer, topic=queue2, message=json_data)
 
 
-def poll(queue1, errorQueue, queue2, storefunction):
+def poll(port, queue1, errorQueue, queue2, storefunction):
     """Process messages received from queue1"""
-    messages = queue1.receive_messages()  # Note: MaxNumberOfMessages default is 1.
-    for m in messages:
-        process_message(m, errorQueue, queue2, storefunction)
+    consumer = consumerInstance(port=port, topic=queue1)
+    producer = producerInstance(port=port)
+    for m in consumer:
+        message = m.value
+        process_message(producer, message, errorQueue, queue2, storefunction)
 
 

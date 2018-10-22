@@ -20,20 +20,18 @@
 
 import json
 import argparse
-
-from kafka import KafkaProducer
-from kafka import KafkaConsumer
+import kafka
 
 
 def producerInstance(port):
     """Creates an instance of a producer """
-    producer_instance = KafkaProducer(bootstrap_servers=port)
+    producer_instance = kafka.KafkaProducer(bootstrap_servers=port)
     return producer_instance
 
 
 def consumerInstance(port, topic):
     """Creates an instance of consumer of a defined topic """
-    consumer_instance = KafkaConsumer(bootstrap_servers=port, topic=topic)
+    consumer_instance = kafka.KafkaConsumer(bootstrap_servers=port, topic=topic)
     return consumer_instance
 
 

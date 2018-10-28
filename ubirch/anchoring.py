@@ -22,7 +22,6 @@ import json
 import argparse
 import kafka
 
-
 def producerInstance(port):
     """Creates an instance of a producer """
     producer_instance = kafka.KafkaProducer(bootstrap_servers=port)

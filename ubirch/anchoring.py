@@ -18,19 +18,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from kafka import *
 import json
 import argparse
-import kafka
 
 def producerInstance(port):
     """Creates an instance of a producer """
-    producer_instance = kafka.KafkaProducer(bootstrap_servers=port)
+    producer_instance = KafkaProducer(bootstrap_servers=port)
     return producer_instance
 
 
-def consumerInstance(port, topic):
+def consumerInstance(topics, port):
     """Creates an instance of consumer of a defined topic """
-    consumer_instance = kafka.KafkaConsumer(bootstrap_servers=port, topic=topic)
+    consumer_instance = KafkaConsumer(topics, bootstrap_servers=port)
     return consumer_instance
 
 
@@ -38,16 +38,34 @@ def set_arguments(servicetype):
     parser = argparse.ArgumentParser(description="Ubirch " + servicetype + " anchoring service")
     parser.add_argument('-p', '--port',
                         help="port of the producer or consumer, default is 9092",
-                        metavar="PORT", type=str, default="localhost:9092")
-    parser.add_argument('-kf', '--keyfile', help='location of your keyfile', metavar='PATH TO KEYFILE', type=str)
+                        metavar="KAFKA PORT", type=list, default=['localhost:9092'])
+
+
+    if servicetype == "MultiChain":
+        parser.add_argument('-rpcuser', help="For multichain API calls", metavar="RPC USER",
+                            type=str, default = 'multichainrpc')
+        parser.add_argument('-rpcpasswd', help="For multichain API calls", metavar="RPC PASSWORD",
+                            type=str, default = 'YoUrLoNgRpCpAsSwOrD')
+        parser.add_argument('-rpchost', help="For multichain API calls", metavar="RPC HOST",
+                            type=str, default = 'localhost')
+        parser.add_argument('-rpcport', help="For multichain API calls", metavar="RPC PORT",
+                            type=str, default = '4770')
+        parser.add_argument('-chainname', help="For multichain API calls", metavar="CHAIN NAME",
+                            type=str, default = 'ubirch-multichain')
+
+    if servicetype == "ethereum":
+        parser.add_argument('-p', '--pwd', help="password used to decrypt the Keystore File", metavar="PASSWORD", type=str)
+        parser.add_argument('-kf', '--keyfile', help='location of your keyfile', metavar='PATH TO KEYFILE', type=str)
 
     return parser.parse_args()
 
 
 def send(producer, topic, message):
     """ Sends a message to the topic via the producer and then flushes"""
-    message_bytes = bytes(message)
-    producer.send(topic, value=message_bytes)
+    message_bytes = bytes(message.encode('utf-8'))
+    if type(topic) == bytes:
+        topic = topic.decode('utf-8')
+    producer.send(topic, message_bytes)
     producer.flush()
 
 
@@ -69,23 +87,20 @@ def process_message(message, errorQueue, queue2, storefunction, producer):
     storingResult = storefunction(message) #Anchoring of the message body
     if storingResult == False:
         json_error = json.dumps({"Not a hash": message})
-        send(producer=producer, topic=errorQueue, message=json_error)
+        send(producer, errorQueue, json_error)
 
     elif storingResult['status'] == 'timeout':
         json_error = json.dumps(storingResult)
-        send(producer=producer, topic=errorQueue, message=json_error)
+        send(producer, errorQueue, json_error)
 
     else:
         json_data = json.dumps(storingResult)
-        send(producer=producer, topic=queue2, message=json_data)
+        send(producer, queue2, json_data)
 
 
-def poll(port, queue1, errorQueue, queue2, storefunction):
+def poll(queue1, errorQueue, queue2, storefunction, producer):
     """Process messages received from queue1"""
-    consumer = consumerInstance(port=port, topic=queue1)
-    producer = producerInstance(port=port)
-    for m in consumer:
+    for m in queue1:
         message = m.value
-        process_message(producer, message, errorQueue, queue2, storefunction)
-
+        process_message(message, errorQueue, queue2, storefunction, producer)
 

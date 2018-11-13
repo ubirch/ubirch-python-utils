@@ -10,15 +10,12 @@ To set up the different arguments needed to connect to the SQS Server and to acc
 ```python
 from ubirch.anchoring import *
 
-args = set_arguments(servicetype='ethereum') # Or 'iota"
+args = set_arguments(servicetype='ethereum') # Or 'IOTA or 'MultiChain'
 
-#To access the SQS Queue
-url = args.url
-region = args.region
-aws_secret_access_key = args.accesskey
-aws_access_key_id = args.keyid
+#To access the Kafka server
+port = args.port
 
-#To unlock your wallet
+#To unlock your wallet (if servicename=='ethereum')
 password = args.pwd
 keyfile = args.keyfile
 

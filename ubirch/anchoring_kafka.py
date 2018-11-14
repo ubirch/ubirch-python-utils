@@ -18,9 +18,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from kafka import *
 import json
 import argparse
+from kafka import *
+
 
 def producerInstance(port):
     """Creates an instance of a producer """

@@ -35,7 +35,7 @@ def consumerInstance(topics, port):
 
 
 def set_arguments(servicetype):
-    parser = argparse.ArgumentParser(description="Ubirch " + servicetype + " anchoring service")
+    parser = argparse.ArgumentParser(description="Ubirch " + servicetype + " anchoring service using Kafka")
     parser.add_argument('-p', '--port',
                         help="port of the producer or consumer, default is 9092",
                         metavar="KAFKA PORT", type=list, default=['localhost:9092'])

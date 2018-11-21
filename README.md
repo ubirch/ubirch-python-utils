@@ -1,16 +1,16 @@
 # ubirch library for ubirch anchoring services
 
-This library contains several useful tools used to connect to a SQS server and anchor messages retrieved from a queue to the IOTA Tangle or the Ethereum Blockchain.
+This library contains several useful tools used to connect to a SQS or Kafka and anchor messages retrieved from a queue to the IOTA Tangle or the Ethereum Blockchain.
  
 ## Usage
 
-### Configuration, connection to a SQS server and retrieving queues.
+### Configuration, connection to a Kafka server and retrieving queues.
 
 To set up the different arguments needed to connect to the SQS Server and to access the ETH Wallet.
 ```python
-from ubirch.anchoring import *
+from ubirch.anchoring_kafka import *
 
-args = set_arguments(servicetype='ethereum') # Or 'IOTA or 'MultiChain'
+args = set_arguments(servicetype='ethereum') # Or 'IOTA'
 
 #To access the Kafka server
 port = args.port
@@ -19,10 +19,10 @@ port = args.port
 password = args.pwd
 keyfile = args.keyfile
 
-queue1 = getQueue('queue1', url, region, aws_secret_access_key, aws_access_key_id)
+queue1 = KafkaConsumer('queue1', bootstrap_servers=port)
 
 ```
-### Polling a queue and processing its messages
+### Polling a topic and processing its messages
 
 Please see [ubirch-ethereum-service](https://github.com/ubirch/ubirch-ethereum-service/blob/master/ethereumService.py) or [ubirch-iota-service](https://github.com/ubirch/ubirch-iota-service/blob/master/iotaService.py) to how this library is put into action. 
 

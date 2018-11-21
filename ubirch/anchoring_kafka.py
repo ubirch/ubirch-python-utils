@@ -20,19 +20,17 @@
 
 import json
 import argparse
-from kafka import *
+
+# def producerInstance(port):
+#     """Creates an instance of a producer """
+#     producer_instance = KafkaProducer(bootstrap_servers=port)
+#     return producer_instance
 
 
-def producerInstance(port):
-    """Creates an instance of a producer """
-    producer_instance = KafkaProducer(bootstrap_servers=port)
-    return producer_instance
-
-
-def consumerInstance(topics, port):
-    """Creates an instance of consumer of a defined topic """
-    consumer_instance = KafkaConsumer(topics, bootstrap_servers=port)
-    return consumer_instance
+# def consumerInstance(topics, port):
+#     """Creates an instance of consumer of a defined topic """
+#     consumer_instance = KafkaConsumer(topics, bootstrap_servers=port)
+#     return consumer_instance
 
 
 def set_arguments(servicetype):
@@ -90,7 +88,7 @@ def process_message(message, errorQueue, queue2, storefunction, producer):
         json_error = json.dumps({"Not a hash": message})
         send(producer, errorQueue, json_error)
 
-    elif storingResult['status'] == 'timeout':
+    elif storingResult['status'] == 'timeout': #For Ethereum
         json_error = json.dumps(storingResult)
         send(producer, errorQueue, json_error)
 

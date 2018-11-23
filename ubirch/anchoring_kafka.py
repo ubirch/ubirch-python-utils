@@ -82,7 +82,6 @@ def process_message(message, errorQueue, queue2, storefunction, producer):
     """Anchors the message m in a DLT specified by the storefunction parameter.
     Sends error (non hex message and timeouts) in the errorQueue.
     Sends JSON docs containing the txid and the input data in queue2 if the anchoring was successful"""
-
     storingResult = storefunction(message) #Anchoring of the message body
     if storingResult == False:
         json_error = json.dumps({"Not a hash": message})
@@ -100,6 +99,6 @@ def process_message(message, errorQueue, queue2, storefunction, producer):
 def poll(queue1, errorQueue, queue2, storefunction, producer):
     """Process messages received from queue1"""
     for m in queue1:
-        message = m.value
+        message = m.value.decode('utf-8')
         process_message(message, errorQueue, queue2, storefunction, producer)
 

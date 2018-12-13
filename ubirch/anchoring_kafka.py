@@ -53,7 +53,7 @@ def set_arguments(servicetype):
                             type=str, default = 'ubirch-multichain')
 
     if servicetype == "ethereum":
-        parser.add_argument('-p', '--pwd', help="password used to decrypt the Keystore File", metavar="PASSWORD", type=str)
+        parser.add_argument('-pwd', '--pwd', help="password used to decrypt the Keystore File", metavar="PASSWORD", type=str)
         parser.add_argument('-kf', '--keyfile', help='location of your keyfile', metavar='PATH TO KEYFILE', type=str)
 
     return parser.parse_args()

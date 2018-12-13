@@ -21,17 +21,6 @@
 import json
 import argparse
 
-# def producerInstance(port):
-#     """Creates an instance of a producer """
-#     producer_instance = KafkaProducer(bootstrap_servers=port)
-#     return producer_instance
-
-
-# def consumerInstance(topics, port):
-#     """Creates an instance of consumer of a defined topic """
-#     consumer_instance = KafkaConsumer(topics, bootstrap_servers=port)
-#     return consumer_instance
-
 
 def set_arguments(servicetype):
     parser = argparse.ArgumentParser(description="Ubirch " + servicetype + " anchoring service using Kafka")

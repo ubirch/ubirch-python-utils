@@ -104,7 +104,6 @@ def poll(queue1, errorQueue, queue2, storefunction):
     """Process messages received from queue1"""
     messages = queue1.receive_messages()  # Note: MaxNumberOfMessages default is 1.
     for m in messages:
-        message = m.decode('utf-8')
-        process_message(message, errorQueue, queue2, storefunction)
+        process_message(m, errorQueue, queue2, storefunction)
 
 

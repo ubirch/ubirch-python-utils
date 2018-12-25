@@ -116,20 +116,15 @@ def process_message(message, server, errorQueue, queue2, storefunction, producer
         if storingResult == False:
             json_error = json.dumps({"Not a hash": message})
             send(json_error, server, queue=errorQueue, topic='errorQueue', producer=producer)
-            if server == 'SQS':
-                message.delete()
 
         elif storingResult['status'] == 'timeout':  # For Ethereum
             json_error = json.dumps(storingResult)
             send(json_error, server, queue=errorQueue, topic='errorQueue', producer=producer)
-            if server == 'SQS':
-                message.delete()
+
 
         else:
             json_data = json.dumps(storingResult)
             send(json_data, server, queue=queue2, topic='queue2', producer=producer)
-            if server == 'SQS':
-                message.delete()
 
 
 
@@ -141,6 +136,8 @@ def poll(queue1, errorQueue, queue2, storefunction, server, producer):
             message = m.body
             print('pollling message : ', message)
             process_message(message, server, errorQueue, queue2, storefunction, producer)
+            m.delete()
+
     elif server == 'KAFKA':
         for m in queue1:
             message = m.value.decode('utf-8')

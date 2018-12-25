@@ -18,9 +18,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import ubirch.anchoring_SQS as SQS
-import ubirch.anchoring_kafka as kafka
-
+from ubirch.anchoring import *
 import unittest
 
 # TODO : add more tests
@@ -31,9 +29,9 @@ class TestUbirchAnchoring(unittest.TestCase):
         lowerhex = "0x0123456789abcdef"
         upperhex = "0xABCDEF"
         nonhex = "0x123helloworld"
-        self.assertTrue(SQS.is_hex(lowerhex))
-        self.assertTrue(SQS.is_hex(upperhex))
-        self.assertTrue(not(SQS.is_hex(nonhex)))
+        self.assertTrue(is_hex(lowerhex))
+        self.assertTrue(is_hex(upperhex))
+        self.assertTrue(not(is_hex(nonhex)))
 
 
 

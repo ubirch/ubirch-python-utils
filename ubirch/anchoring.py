@@ -27,18 +27,6 @@ def set_arguments(servicetype):
 
     parser.add_argument('-s', '--server', help='Choice between KAFKA or SQS, please use capslock', metavar='SQS OR KAFKA', type=str)
 
-    if servicetype == "MultiChain":
-        parser.add_argument('-rpcuser', help="For multichain API calls", metavar="RPC USER",
-                            type=str, default='multichainrpc')
-        parser.add_argument('-rpcpasswd', help="For multichain API calls", metavar="RPC PASSWORD",
-                            type=str, default='YoUrLoNgRpCpAsSwOrD')
-        parser.add_argument('-rpchost', help="For multichain API calls", metavar="RPC HOST",
-                            type=str, default='localhost')
-        parser.add_argument('-rpcport', help="For multichain API calls", metavar="RPC PORT",
-                            type=str, default='4770')
-        parser.add_argument('-chainname', help="For multichain API calls", metavar="CHAIN NAME",
-                            type=str, default='ubirch-multichain')
-
     if servicetype == "ethereum":
         parser.add_argument('-pwd', '--pwd', help="password used to decrypt the Keystore File", metavar="PASSWORD",
                             type=str)
@@ -121,7 +109,6 @@ def process_message(message, server, errorQueue, queue2, storefunction, producer
             json_error = json.dumps(storingResult)
             send(json_error, server, queue=errorQueue, topic='errorQueue', producer=producer)
 
-
         else:
             json_data = json.dumps(storingResult)
             send(json_data, server, queue=queue2, topic='queue2', producer=producer)
@@ -134,7 +121,6 @@ def poll(queue1, errorQueue, queue2, storefunction, server, producer):
         messages = queue1.receive_messages()  # Note: MaxNumberOfMessages default is 1.
         for m in messages:
             message = m.body
-            print('pollling message : ', message)
             process_message(message, server, errorQueue, queue2, storefunction, producer)
             m.delete()
 

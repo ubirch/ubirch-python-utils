@@ -22,6 +22,7 @@ import json
 import argparse
 import boto3
 
+
 def set_arguments(servicetype):
     parser = argparse.ArgumentParser(description="Ubirch " + servicetype + " anchoring service")
 
@@ -77,7 +78,7 @@ def getQueue(queue_name, url, region, aws_secret_access_key, aws_access_key_id):
     return queue
 
 
-# SENDING PROCESS
+# TRANSACTION SENDING PROCESS
 def send(message, server, queue=None, topic=None, producer=None):
     if server == 'SQS':
         """ Sends a message to the queue, return a SQS.Message element"""

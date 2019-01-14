@@ -23,9 +23,10 @@ import unittest
 
 # TODO : add more tests
 
+
 class TestUbirchAnchoring(unittest.TestCase):
 
-    def test_is_hex_bothlibs(self):
+    def test_is_hex(self):
         lowerhex = "0x0123456789abcdef"
         upperhex = "0xABCDEF"
         nonhex = "0x123helloworld"

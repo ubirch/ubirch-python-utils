@@ -23,15 +23,20 @@ import argparse
 import boto3
 
 
-def set_arguments(servicetype):
-    parser = argparse.ArgumentParser(description="Ubirch " + servicetype + " anchoring service")
+def set_arguments(service):
+    parser = argparse.ArgumentParser(description="Ubirch " + service + " anchoring service")
 
     parser.add_argument('-s', '--server', help='Choice between KAFKA or SQS, please use capslock', metavar='SQS OR KAFKA', type=str)
 
-    if servicetype == "ethereum":
+    if service == "ethereum":
         parser.add_argument('-pwd', '--pwd', help="password used to decrypt the Keystore File", metavar="PASSWORD",
                             type=str)
         parser.add_argument('-kf', '--keyfile', help='location of your keyfile', metavar='PATH TO KEYFILE', type=str)
+
+    if service == "IOTA":
+        parser.add_argument('-d', '--depth', help='depth', metavar='DEPTH', type=int, default=6)
+        parser.add_argument('-uri', '--uri', help='URI of the IOTA node', metavar='IOTA NODE URI', type=str,
+                            default='https://nodes.devnet.iota.org:443')
 
     # KAFKA config
     parser.add_argument('-p', '--port',
@@ -50,43 +55,65 @@ def set_arguments(servicetype):
 
     return parser.parse_args()
 
+
 def is_hex(s):
-    """Explicit name, used to detect errors in to be sent hashes"""
+    """
+
+    Explicit name, used to detect errors in to be sent hashes
+
+    """
     try:
         int(s, 16)
         return True
     except ValueError:
         return False
 
+
 # FOR SQS ONLY
-def connect(url, region, aws_secret_access_key, aws_access_key_id):
-    """Connects to the SQS server related to those credentials."""
+def connect_sqs(url, region, aws_secret_access_key, aws_access_key_id):
+    """
+
+    Connects to the SQS server related to the credentials in parameters
+
+    """
     client = boto3.resource('sqs',
-                            endpoint_url=url,  #
-                            region_name=region,  #
-                            aws_secret_access_key=aws_secret_access_key,  # parameters passed as arguments
-                            aws_access_key_id=aws_access_key_id,  #
+                            endpoint_url=url,
+                            region_name=region,
+                            aws_secret_access_key=aws_secret_access_key,
+                            aws_access_key_id=aws_access_key_id,
                             use_ssl=False)
     return client
 
 
-def getQueue(queue_name, url, region, aws_secret_access_key, aws_access_key_id):
-    """Returns the queue with the name queue_name of the server identified by the other parameters"""
-    client = connect(url, region, aws_secret_access_key, aws_access_key_id)
+def get_queue(queue_name, url, region, aws_secret_access_key, aws_access_key_id):
+    """
+
+    :return: Returns the queue with the name: queue_name of the SQS server identified by the other parameters
+
+    """
+    client = connect_sqs(url, region, aws_secret_access_key, aws_access_key_id)
     queue = client.get_queue_by_name(QueueName=queue_name)
-    print("The queue : " + queue_name + " has : " + queue.url + " for URL")
     return queue
 
 
 # TRANSACTION SENDING PROCESS
 def send(message, server, queue=None, topic=None, producer=None):
+    """
+    Sends a message to the queue or topic passed as arguments
+
+    :param message: Message to be sent in the kafka topic or the sqs queue
+    :param server: Specified whether an SQS server (e.g: elasticMQ) or an Apache Kafka server will be used
+    :param queue: SQS queue in which to send the message (if server='SQS')
+    :param topic: Apache Kafka topic in which to send the message (if server='KAFKA')
+    :param producer: Apache KAFKA producer, = None is not specified
+
+    """
+
     if server == 'SQS':
-        """ Sends a message to the queue, return a SQS.Message element"""
         return queue.send_message(
             MessageBody=message
         )
     elif server == 'KAFKA':
-        """ Sends a message to the topic via the producer and then flushes"""
         message_bytes = bytes(message.encode('utf-8'))
         if type(topic) == bytes:
             topic = topic.decode('utf-8')
@@ -94,40 +121,60 @@ def send(message, server, queue=None, topic=None, producer=None):
         producer.flush()
 
 
-"""Anchors the message m in a DLT specified by the storefunction parameter.
-    Sends error (non hex message and timeouts) in the errorQueue.
-    Sends JSON docs containing the txid and the input data in queue2 if the anchoring was successful
-    Storefunction should always return either False is the string is non-hex or a dict containing {'txid': hash, 'hash': string}"""
+def process_message(message, server, error_queue, queue2, store_function, producer):
+    """
+    Anchors the message m in a DLT specified by the store_function parameter.
+        Sends error (non hex message and timeouts) in the errorQueue.
+        Sends JSON docs containing the txid and the input data in queue2 if the anchoring was successful
+        Storefunction should always return either False is the string is non-hex or a dict containing
+        {'txid': hash, 'hash': string}
+
+    :param message: message to anchor in the blockchain or tangle
+    :param server: choice between 'SQS' or 'KAFKA' : the choice of the messaging service
+    :param error_queue: SQS queue or KAFKA topic, depending on the server choice
+    :param queue2: SQS queue or KAFKA topic, depending on the server choice
+    :param store_function: function depending on the blockchain or tangle used (IOTA, Multichain, Ethereum)
+    :param producer: Kafka producer used to 'produce' messages in a topic
+
+    """
+
+    storing_result = store_function(message)
+    if not storing_result:
+        json_error = json.dumps({"Not a hash": message})
+        send(json_error, server, queue=error_queue, topic='error_queue', producer=producer)
+
+    elif storing_result['status'] == 'timeout':  # For Ethereum
+        json_error = json.dumps(storing_result)
+        send(json_error, server, queue=error_queue, topic='error_queue', producer=producer)
+
+    else:
+        json_data = json.dumps(storing_result)
+        send(json_data, server, queue=queue2, topic='queue2', producer=producer)
 
 
-def process_message(message, server, errorQueue, queue2, storefunction, producer):
-        storingResult = storefunction(message)
-        if storingResult == False:
-            json_error = json.dumps({"Not a hash": message})
-            send(json_error, server, queue=errorQueue, topic='errorQueue', producer=producer)
+def poll(queue1, error_queue, queue2, store_function, server, producer):
+    """
+    Polls queue1 (kafka topic or SQS queue, depending on the server parameter) and process its messages
 
-        elif storingResult['status'] == 'timeout':  # For Ethereum
-            json_error = json.dumps(storingResult)
-            send(json_error, server, queue=errorQueue, topic='errorQueue', producer=producer)
+    :param queue1: SQS queue or KAFKA topic, depending on the server choice
+    :param error_queue: SQS queue or KAFKA topic, depending on the server choice
+    :param queue2: SQS queue or KAFKA topic, depending on the server choice
 
-        else:
-            json_data = json.dumps(storingResult)
-            send(json_data, server, queue=queue2, topic='queue2', producer=producer)
+    :param store_function: Choice of the type of service between IOTA, MultiChain or Ethereum
+    :param server: choice betweeen 'SQS' or 'KAFKA' : the choice of the messaging service
+    :param producer: Kafka producer used to 'produce' messages in a topic
 
-
-
-def poll(queue1, errorQueue, queue2, storefunction, server, producer):
-    """Process messages received from queue1"""
+    """
     if server == 'SQS':
-        messages = queue1.receive_messages()  # Note: MaxNumberOfMessages default is 1.
+        messages = queue1.receive_messages()
         for m in messages:
             message = m.body
-            process_message(message, server, errorQueue, queue2, storefunction, producer)
+            process_message(message, server, error_queue, queue2, store_function, producer)
             m.delete()
 
     elif server == 'KAFKA':
         for m in queue1:
             message = m.value.decode('utf-8')
-            process_message(message, server, errorQueue, queue2, storefunction, producer)
+            process_message(message, server, error_queue, queue2, store_function, producer)
 
 

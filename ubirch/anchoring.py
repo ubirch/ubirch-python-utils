@@ -27,6 +27,7 @@ def set_arguments(service):
     parser = argparse.ArgumentParser(description="Ubirch " + service + " anchoring service")
 
     parser.add_argument('-s', '--server', help='Choice between KAFKA or SQS, please use capslock', metavar='SQS OR KAFKA', type=str)
+    parser.add_argument('-ll', '--loglevel', help="log level", metavar="LOGLEVEL", default="DEBUG")
 
     if service == "ethereum":
         parser.add_argument('-pwd', '--pwd', help="password used to decrypt the Keystore File", metavar="PASSWORD",

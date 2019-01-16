@@ -21,7 +21,7 @@
 import json
 import argparse
 import boto3
-
+from iota import Address
 
 def set_arguments(service):
     parser = argparse.ArgumentParser(description="Ubirch " + service + " anchoring service")
@@ -35,9 +35,16 @@ def set_arguments(service):
         parser.add_argument('-kf', '--keyfile', help='location of your keyfile', metavar='PATH TO KEYFILE', type=str)
 
     if service == "IOTA":
+        parser.add_argument('-a', '--address', help='IOTA address used for anchoring', metavar='IOTA ADDRESS',
+                            type=str,
+                            default='9E99GKDY9BYDQ9PGOHHMUWJLBDREMK9BVHUFRHVXCVUIFXLNTZMXRM9TDXJKZDAKIGZIMCJSH9Q9V9GKW')
         parser.add_argument('-d', '--depth', help='depth', metavar='DEPTH', type=int, default=6)
         parser.add_argument('-uri', '--uri', help='URI of the IOTA node', metavar='IOTA NODE URI', type=str,
                             default='https://nodes.devnet.iota.org:443')
+        parser.add_argument('-s', '--seed', help='IOTA seed', metavar='IOTA SEED', type=str, default=None)
+
+
+
 
     # KAFKA config
     parser.add_argument('-p', '--port',

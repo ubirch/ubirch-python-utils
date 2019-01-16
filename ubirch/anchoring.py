@@ -41,7 +41,7 @@ def set_arguments(service):
         parser.add_argument('-d', '--depth', help='depth', metavar='DEPTH', type=int, default=6)
         parser.add_argument('-uri', '--uri', help='URI of the IOTA node', metavar='IOTA NODE URI', type=str,
                             default='https://nodes.devnet.iota.org:443')
-        parser.add_argument('-s', '--seed', help='IOTA seed', metavar='IOTA SEED', type=str, default=None)
+        parser.add_argument('-seed', '--seed', help='IOTA seed', metavar='IOTA SEED', type=str, default=None)
 
 
 

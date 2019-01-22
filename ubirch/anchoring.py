@@ -21,7 +21,7 @@
 import json
 import argparse
 import boto3
-from iota import Address
+
 
 def set_arguments(service):
     parser = argparse.ArgumentParser(description="Ubirch " + service + " anchoring service")
@@ -33,6 +33,13 @@ def set_arguments(service):
         parser.add_argument('-pwd', '--pwd', help="password used to decrypt the Keystore File", metavar="PASSWORD",
                             type=str)
         parser.add_argument('-kf', '--keyfile', help='location of your keyfile', metavar='PATH TO KEYFILE', type=str)
+        parser.add_argument('-n', '--node', help='Eth node url to connect to', metavar='ETH NODE URL', type=str,
+                            default="http://localhost:8545")
+        parser.add_argument('-a', '--address', help='Ethereum address used for anchoring', metavar='ETHEREUM ADDRESS',
+                            type=str,
+                            default='0x31c2CC8b7f15F0A9e7efFdd5Fa02e37E66257744')
+
+
 
     if service == "IOTA":
         parser.add_argument('-a', '--address', help='IOTA address used for anchoring', metavar='IOTA ADDRESS',
@@ -49,7 +56,7 @@ def set_arguments(service):
     # KAFKA config
     parser.add_argument('-p', '--port',
                         help="port of the producer or consumer, default is 9092",
-                        metavar="KAFKA PORT", type=list, default=['localhost:9092'])
+                        metavar="KAFKA PORT", default=['localhost:9092'])
     # SQS config
     parser.add_argument('-u', '--url',
                         help="endpoint url of the sqs server, input localhost:9324 for local connection (default)",

@@ -39,8 +39,6 @@ def set_arguments(service):
                             type=str,
                             default='0x31c2CC8b7f15F0A9e7efFdd5Fa02e37E66257744')
 
-
-
     if service == "IOTA":
         parser.add_argument('-a', '--address', help='IOTA address used for anchoring', metavar='IOTA ADDRESS',
                             type=str,
@@ -49,8 +47,6 @@ def set_arguments(service):
         parser.add_argument('-uri', '--uri', help='URI of the IOTA node', metavar='IOTA NODE URI', type=str,
                             default='https://nodes.devnet.iota.org:443')
         parser.add_argument('-seed', '--seed', help='IOTA seed', metavar='IOTA SEED', type=str, default=None)
-
-
 
 
     # KAFKA config

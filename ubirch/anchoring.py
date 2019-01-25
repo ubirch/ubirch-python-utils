@@ -55,7 +55,7 @@ def set_arguments(service):
     # KAFKA config
     parser.add_argument('-p', '--port',
                         help="port of the producer or consumer, default is 9092",
-                        metavar="KAFKA PORT", default=['localhost:9092'])
+                        metavar="KAFKA PORT", default='localhost:9092')
     # SQS config
     parser.add_argument('-u', '--url',
                         help="endpoint url of the sqs server, input localhost:9324 for local connection (default)",

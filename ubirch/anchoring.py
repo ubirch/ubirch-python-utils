@@ -26,13 +26,15 @@ import boto3
 def set_arguments(service):
     parser = argparse.ArgumentParser(description="Ubirch " + service + " anchoring service")
 
-    parser.add_argument('-s', '--server', help='Choice between KAFKA or SQS, please use capslock', metavar='SQS OR KAFKA', type=str)
+    parser.add_argument('-s', '--server', help='Choice between KAFKA or SQS, please use capslock',
+                        metavar='SQS OR KAFKA', type=str, default=None)
     parser.add_argument('-ll', '--loglevel', help="log level", metavar="LOGLEVEL", default="DEBUG")
 
     if service == "ethereum":
         parser.add_argument('-pwd', '--pwd', help="password used to decrypt the Keystore File", metavar="PASSWORD",
-                            type=str)
-        parser.add_argument('-kf', '--keyfile', help='location of your keyfile', metavar='PATH TO KEYFILE', type=str)
+                            type=str, default=None)
+        parser.add_argument('-kf', '--keyfile', help='location of your keyfile', metavar='PATH TO KEYFILE', type=str,
+                            default=None)
         parser.add_argument('-n', '--node', help='Eth node url to connect to', metavar='ETH NODE URL', type=str,
                             default="http://localhost:8545")
         parser.add_argument('-a', '--address', help='Ethereum address used for anchoring', metavar='ETHEREUM ADDRESS',
@@ -46,7 +48,8 @@ def set_arguments(service):
         parser.add_argument('-d', '--depth', help='depth', metavar='DEPTH', type=int, default=6)
         parser.add_argument('-uri', '--uri', help='URI of the IOTA node', metavar='IOTA NODE URI', type=str,
                             default='https://nodes.devnet.iota.org:443')
-        parser.add_argument('-seed', '--seed', help='IOTA seed', metavar='IOTA SEED', type=str, default=None)
+        parser.add_argument('-seed', '--seed', help='IOTA seed, default is None', metavar='IOTA SEED',
+                            type=str, default=None)
 
 
     # KAFKA config

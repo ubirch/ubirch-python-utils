@@ -48,29 +48,33 @@ def set_arguments(service):
         parser.add_argument('-d', '--depth', help='depth', metavar='DEPTH', type=int, default=6)
         parser.add_argument('-uri', '--uri', help='URI of the IOTA node', metavar='IOTA NODE URI', type=str,
                             default='https://nodes.devnet.iota.org:443')
+
         parser.add_argument('-seed', '--seed', help='IOTA seed, default is None', metavar='IOTA SEED',
                             type=str, default=None)
 
     if service == "multichain":
-        parser.add_argument('-chain', '--chain', help='location of your keyfile', metavar='CHAIN NAME', type=str,
-                            default=None)
-        parser.add_argument('-path', '--path', help='location of your keyfile', metavar='PATH TO CHAIN DIRECTORY', type=str,
-                            default=None)
+        parser.add_argument('-chain', '--chain', help='Name of the multichain blockchain', metavar='CHAIN NAME',
+                            type=str, default=None)
+        parser.add_argument('-path', '--path', help='Path to the multichain directory',
+                            metavar='PATH TO CHAIN DIRECTORY', type=str, default=None)
 
     # SQS queues & Kafka topics
+
     parser.add_argument('-i', '--input', help='Kafka topic receiving input messages not anchored yet',
-                        metavar='INPUT', default='input-messages')
+                        metavar='INPUT', default='input')
     parser.add_argument('-o', '--output', help='Kafka topic receiving'
-                                               'JSON documents: {status:added, message:m, tx_hash: txic} ',
-                        metavar='OUTPUT', default='output-messages')
+                                               'JSON documents: {status:added, message:m, tx_hash: txid} ',
+                        metavar='OUTPUT', default='output')
     parser.add_argument('-e', '--errors', help='Kafka topic receiving error messages',
-                        metavar='ERRORS', default='error-messages')
+                        metavar='ERRORS', default='errors')
 
     # KAFKA config
+
     parser.add_argument('-bs', '--bootstrap_server',
                         help="host:port for kafka consumer/producer, default is localhost:9092",
                         metavar="KAFKA_BOOTSTRAP_SERVER", default='localhost:9092')
     # SQS config
+
     parser.add_argument('-u', '--url',
                         help="endpoint url of the sqs server, input localhost:9324 for local connection (default)",
                         metavar="URL", type=str, default="http://localhost:9324")
@@ -98,6 +102,7 @@ def is_hex(s):
 
 
 # FOR SQS ONLY
+
 def connect_sqs(url, region, aws_secret_access_key, aws_access_key_id):
     """
 
@@ -125,6 +130,7 @@ def get_queue(queue_name, url, region, aws_secret_access_key, aws_access_key_id)
 
 
 # TRANSACTION SENDING PROCESS
+
 def send(message, server, queue=None, topic=None, producer=None):
     """
     Sends a message to the queue or topic passed as arguments

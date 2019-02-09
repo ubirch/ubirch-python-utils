@@ -51,14 +51,20 @@ def set_arguments(service):
         parser.add_argument('-seed', '--seed', help='IOTA seed, default is None', metavar='IOTA SEED',
                             type=str, default=None)
 
+    if service == "multichain":
+        parser.add_argument('-chain', '--chain', help='location of your keyfile', metavar='CHAIN NAME', type=str,
+                            default=None)
+        parser.add_argument('-path', '--path', help='location of your keyfile', metavar='PATH TO CHAIN DIRECTORY', type=str,
+                            default=None)
+
     # SQS queues & Kafka topics
     parser.add_argument('-i', '--input', help='Kafka topic receiving input messages not anchored yet',
-                        metavar='INPUT', default='input_messages')
+                        metavar='INPUT', default='input-messages')
     parser.add_argument('-o', '--output', help='Kafka topic receiving'
                                                'JSON documents: {status:added, message:m, tx_hash: txic} ',
-                        metavar='OUTPUT', default='output_messages')
+                        metavar='OUTPUT', default='output-messages')
     parser.add_argument('-e', '--errors', help='Kafka topic receiving error messages',
-                        metavar='ERRORS', default='error_messages')
+                        metavar='ERRORS', default='error-messages')
 
     # KAFKA config
     parser.add_argument('-bs', '--bootstrap_server',

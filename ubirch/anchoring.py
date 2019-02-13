@@ -33,38 +33,51 @@ def set_arguments(service):
     if service == "ethereum":
         parser.add_argument('-pwd', '--pwd', help="password used to decrypt the Keystore File", metavar="PASSWORD",
                             type=str, default=None)
+
         parser.add_argument('-kf', '--keyfile', help='location of your keyfile', metavar='PATH TO KEYFILE', type=str,
                             default=None)
+
         parser.add_argument('-n', '--node', help='Eth node url to connect to', metavar='ETH NODE URL', type=str,
                             default="http://localhost:8545")
+
         parser.add_argument('-a', '--address', help='Ethereum address used for anchoring', metavar='ETHEREUM ADDRESS',
                             type=str,
                             default='0x31c2CC8b7f15F0A9e7efFdd5Fa02e37E66257744')
 
-    if service == "IOTA":
+    elif service == "IOTA":
         parser.add_argument('-a', '--address', help='IOTA address used for anchoring', metavar='IOTA ADDRESS',
                             type=str,
                             default='9E99GKDY9BYDQ9PGOHHMUWJLBDREMK9BVHUFRHVXCVUIFXLNTZMXRM9TDXJKZDAKIGZIMCJSH9Q9V9GKW')
         parser.add_argument('-d', '--depth', help='depth', metavar='DEPTH', type=int, default=6)
+
         parser.add_argument('-uri', '--uri', help='URI of the IOTA node', metavar='IOTA NODE URI', type=str,
                             default='https://nodes.devnet.iota.org:443')
 
         parser.add_argument('-seed', '--seed', help='IOTA seed, default is None', metavar='IOTA SEED',
                             type=str, default=None)
 
-    if service == "multichain":
+    elif service == "multichain":
         parser.add_argument('-chain', '--chain', help='Name of the multichain blockchain', metavar='CHAIN NAME',
+                            type=str, default="ubirch-multichain-service")
+
+        parser.add_argument('-path', '--path', help='Path to the multichain-cli',
+                            metavar='PATH TO MULTICHAIN CLI', type=str, default="/usr/local/bin/multichain-cli")
+
+        parser.add_argument('-key', '--key', help='Key used to publish data on a stream', metavar='KEY',
                             type=str, default=None)
-        parser.add_argument('-path', '--path', help='Path to the multichain directory',
-                            metavar='PATH TO CHAIN DIRECTORY', type=str, default=None)
+
+        parser.add_argument('-stream', '--stream', help='Name of the multichain stream used to publish the data', metavar='STREAM NAME',
+                            type=str, default=None)
 
     # SQS queues & Kafka topics
 
     parser.add_argument('-i', '--input', help='Kafka topic receiving input messages not anchored yet',
                         metavar='INPUT', default='input')
+
     parser.add_argument('-o', '--output', help='Kafka topic receiving'
                                                'JSON documents: {status:added, message:m, tx_hash: txid} ',
                         metavar='OUTPUT', default='output')
+
     parser.add_argument('-e', '--errors', help='Kafka topic receiving error messages',
                         metavar='ERRORS', default='errors')
 

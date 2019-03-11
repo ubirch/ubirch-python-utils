@@ -58,7 +58,7 @@ def set_arguments(service):
 
     elif service == "multichain":
         parser.add_argument('-chain', '--chain', help='Name of the multichain blockchain', metavar='CHAIN NAME',
-                            type=str, default="ubirch-multichain-service")
+                            type=str, default="ubirch-multichain")
 
         parser.add_argument('-path', '--path', help='Path to the multichain-cli',
                             metavar='PATH TO MULTICHAIN CLI', type=str, default="/usr/local/bin/multichain-cli")

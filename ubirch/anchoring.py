@@ -30,6 +30,11 @@ def set_arguments(service):
                         metavar='SQS OR KAFKA', type=str, default=None)
     parser.add_argument('-ll', '--loglevel', help="log level", metavar="LOGLEVEL", default="DEBUG")
 
+    parser.add_argument('-ni', '--networkinfo', help="human readable blockchain network info", metavar="NETWORKINFO", required=True)
+
+    parser.add_argument('-nt', '--networktype', help="blockchain network type: mainnet|testnet", metavar="NETWORKTYPE", default="testnet")
+
+
     if service == "ethereum":
         parser.add_argument('-pwd', '--pwd', help="password used to decrypt the Keystore File", metavar="PASSWORD",
                             type=str, default=None)

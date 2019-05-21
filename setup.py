@@ -5,10 +5,10 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="ubirch-python-utils",
-    version="1.3.6",
-    author="Victor Patrin",
-    author_email="victor.patrin150@gmail.com",
-    description="A python utils ubirch for ubirch anchoring services.",
+    version="1.3.8",
+    author="Michael Merz",
+    author_email="dermicha@ubirch.com",
+    description="A python util for ubirch anchoring services.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/ubirch/ubirch-python-utils",
@@ -21,6 +21,5 @@ setuptools.setup(
     install_requires=[
         'kafka-python >= 1.4.3',
         'boto3 >= 1.7.80'
-
     ],
 )

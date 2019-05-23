@@ -61,8 +61,7 @@ def set_arguments(service):
                             type=int,
                             default=4)
 
-
-elif service == "IOTA":
+    elif service == "IOTA":
         parser.add_argument('-a', '--address', help='IOTA address used for anchoring', metavar='IOTA ADDRESS',
                             type=str,
                             default='9E99GKDY9BYDQ9PGOHHMUWJLBDREMK9BVHUFRHVXCVUIFXLNTZMXRM9TDXJKZDAKIGZIMCJSH9Q9V9GKW')

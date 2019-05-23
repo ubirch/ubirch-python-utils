@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="ubirch-python-utils",
-    version="1.3.8",
+    version="1.3.9",
     author="Michael Merz",
     author_email="dermicha@ubirch.com",
     description="A python util for ubirch anchoring services.",

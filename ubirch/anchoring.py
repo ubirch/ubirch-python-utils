@@ -49,7 +49,20 @@ def set_arguments(service):
                             type=str,
                             default='0x31c2CC8b7f15F0A9e7efFdd5Fa02e37E66257744')
 
-    elif service == "IOTA":
+        parser.add_argument('-g', '--gas', help='amount of gas per transaction', metavar='GAS',
+                            type=int,
+                            default=64000)
+
+        parser.add_argument('-gp', '--gasprice', help='gas price per transaction (gwei)', metavar='GAS PRICE',
+                            type=int,
+                            default=40)
+
+        parser.add_argument('-cid', '--chainid', help='chainid 4=Rinkeby / 1=Frontier', metavar='CHAINID',
+                            type=int,
+                            default=4)
+
+
+elif service == "IOTA":
         parser.add_argument('-a', '--address', help='IOTA address used for anchoring', metavar='IOTA ADDRESS',
                             type=str,
                             default='9E99GKDY9BYDQ9PGOHHMUWJLBDREMK9BVHUFRHVXCVUIFXLNTZMXRM9TDXJKZDAKIGZIMCJSH9Q9V9GKW')
